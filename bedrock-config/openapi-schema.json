@@ -1,0 +1,307 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Salesforce Billing Query API",
+    "version": "1.0.0",
+    "description": "API for querying Salesforce billing records including invoices, accounts, usage, and payments"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local MCP Server"
+    }
+  ],
+  "paths": {
+    "/tools/query_invoices": {
+      "post": {
+        "summary": "Query Salesforce Invoices",
+        "description": "Search for invoices by account, date range, or status. Returns invoice details including amounts, dates, and status.",
+        "operationId": "queryInvoices",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "accountId": {
+                    "type": "string",
+                    "description": "Salesforce Account ID (18-character ID)"
+                  },
+                  "startDate": {
+                    "type": "string",
+                    "description": "Start date in YYYY-MM-DD format",
+                    "example": "2024-01-01"
+                  },
+                  "endDate": {
+                    "type": "string",
+                    "description": "End date in YYYY-MM-DD format",
+                    "example": "2024-12-31"
+                  },
+                  "status": {
+                    "type": "string",
+                    "description": "Invoice status",
+                    "enum": ["Paid", "Pending", "Overdue", "Draft"]
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "Maximum number of records to return",
+                    "default": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "totalSize": {
+                      "type": "integer"
+                    },
+                    "records": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "string"},
+                          "invoiceNumber": {"type": "string"},
+                          "accountId": {"type": "string"},
+                          "accountName": {"type": "string"},
+                          "amount": {"type": "number"},
+                          "status": {"type": "string"},
+                          "invoiceDate": {"type": "string"},
+                          "dueDate": {"type": "string"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tools/query_accounts": {
+      "post": {
+        "summary": "Query Salesforce Accounts",
+        "description": "Search for accounts by name or ID. Returns account details including billing address and contact information.",
+        "operationId": "queryAccounts",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "accountName": {
+                    "type": "string",
+                    "description": "Account name to search for (partial match supported)"
+                  },
+                  "accountId": {
+                    "type": "string",
+                    "description": "Specific Salesforce Account ID"
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "description": "Maximum number of records to return",
+                    "default": 50
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "totalSize": {"type": "integer"},
+                    "records": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "string"},
+                          "name": {"type": "string"},
+                          "billingAddress": {"type": "object"},
+                          "phone": {"type": "string"},
+                          "industry": {"type": "string"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tools/query_usage_records": {
+      "post": {
+        "summary": "Query AI Service Usage Records",
+        "description": "Query usage records by account, date range, or service type. Returns usage amounts, costs, and service details.",
+        "operationId": "queryUsageRecords",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "accountId": {
+                    "type": "string",
+                    "description": "Salesforce Account ID"
+                  },
+                  "startDate": {
+                    "type": "string",
+                    "description": "Start date in YYYY-MM-DD format"
+                  },
+                  "endDate": {
+                    "type": "string",
+                    "description": "End date in YYYY-MM-DD format"
+                  },
+                  "serviceType": {
+                    "type": "string",
+                    "description": "Type of AI service",
+                    "enum": ["GPT-4", "GPT-3.5", "Claude", "Embeddings", "Fine-tuning", "Other"]
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "default": 100
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/tools/query_payments": {
+      "post": {
+        "summary": "Query Payment Records",
+        "description": "Query payments by account, invoice, or date range. Returns payment details including amounts, methods, and status.",
+        "operationId": "queryPayments",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "accountId": {"type": "string"},
+                  "invoiceId": {"type": "string"},
+                  "startDate": {"type": "string"},
+                  "endDate": {"type": "string"},
+                  "status": {
+                    "type": "string",
+                    "enum": ["Completed", "Pending", "Failed", "Refunded"]
+                  },
+                  "limit": {"type": "integer", "default": 100}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response"
+          }
+        }
+      }
+    },
+    "/tools/get_billing_summary": {
+      "post": {
+        "summary": "Get Billing Summary",
+        "description": "Get comprehensive billing summary for an account including total invoiced, paid, outstanding balance, and usage statistics.",
+        "operationId": "getBillingSummary",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["accountId"],
+                "properties": {
+                  "accountId": {
+                    "type": "string",
+                    "description": "Salesforce Account ID (required)"
+                  },
+                  "startDate": {
+                    "type": "string",
+                    "description": "Start date in YYYY-MM-DD format"
+                  },
+                  "endDate": {
+                    "type": "string",
+                    "description": "End date in YYYY-MM-DD format"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "summary": {
+                      "type": "object",
+                      "properties": {
+                        "accountId": {"type": "string"},
+                        "totalInvoiced": {"type": "number"},
+                        "totalPaid": {"type": "number"},
+                        "outstandingBalance": {"type": "number"},
+                        "totalUsage": {"type": "number"},
+                        "invoiceCount": {"type": "integer"},
+                        "paymentCount": {"type": "integer"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
+}

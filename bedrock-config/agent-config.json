@@ -1,0 +1,48 @@
+{
+  "agentName": "SalesforceBillingAgent",
+  "description": "AI agent for querying Salesforce billing records including invoices, payments, accounts, and usage data",
+  "foundationModel": "anthropic.claude-3-sonnet-20240229-v1:0",
+  "instruction": "See agent-instructions.txt for detailed instructions",
+  "idleSessionTTLInSeconds": 600,
+  "actionGroups": [
+    {
+      "actionGroupName": "SalesforceQueryActions",
+      "description": "Tools for querying Salesforce billing data",
+      "actionGroupExecutor": {
+        "customControl": "RETURN_CONTROL"
+      },
+      "apiSchema": {
+        "payload": "See openapi-schema.json"
+      },
+      "actionGroupState": "ENABLED"
+    }
+  ],
+  "promptOverrideConfiguration": {
+    "promptConfigurations": [
+      {
+        "promptType": "PRE_PROCESSING",
+        "promptCreationMode": "DEFAULT",
+        "promptState": "ENABLED",
+        "inferenceConfiguration": {
+          "temperature": 0.0,
+          "topP": 0.9,
+          "topK": 250,
+          "maximumLength": 2048,
+          "stopSequences": []
+        }
+      },
+      {
+        "promptType": "ORCHESTRATION",
+        "promptCreationMode": "DEFAULT",
+        "promptState": "ENABLED",
+        "inferenceConfiguration": {
+          "temperature": 0.0,
+          "topP": 0.9,
+          "topK": 250,
+          "maximumLength": 2048,
+          "stopSequences": []
+        }
+      }
+    ]
+  }
+}
